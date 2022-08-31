@@ -9,6 +9,7 @@ class Women(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания') # Создается один раз и не меняется
     time_update = models.DateTimeField(auto_now=True, verbose_name='Время обновления') # Меняется каждый раз при изменении
     is_published = models.BooleanField(default=True, verbose_name='Публикация')
+    #cat = models.ForeignKey("Category", on_delete=models.PROTECT, verbose_name='Категория', related_name='get_posts') - изменение women_set на get_posts
     cat = models.ForeignKey("Category", on_delete=models.PROTECT, verbose_name='Категория') # Category пишем как строку, либо как переменную, но тогда Category должна быть перед Women
 
     def __str__(self):
