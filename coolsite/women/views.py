@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 from .models import *
 from .forms import *
@@ -22,7 +23,13 @@ class WomenHome(DataMixin, ListView):
         return Women.objects.filter(is_published=True)
 
 def about(request):
-    return render(request, "women/about.html", {"menu": menu, "title": "О сайте"})
+    """Пример использования пагинации совместно с функциями представления"""
+    contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, "women/about.html", {'page_obj': page_obj, "menu": menu, "title": "О сайте"})
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
