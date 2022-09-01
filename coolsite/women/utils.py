@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.core.cache import cache
 
 from .models import *
 
@@ -9,10 +10,17 @@ menu = [{'title': 'О сайте', 'url_name': 'about'},
 ]
 
 class DataMixin:
-    paginate_by = 3
+    paginate_by = 20
 
     def get_user_context(self, **kwargs):
         context = kwargs
+
+        """Пример использования кэша
+        cats = cache.get('cats')
+        if not cats:
+            cats = Category.objects.annotate(Count('women'))
+            cache.set('cats', cats, 60)"""
+        
         cats = Category.objects.annotate(Count('women'))
 
         user_menu = menu.copy()

@@ -1,4 +1,3 @@
-from multiprocessing import AuthenticationError
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView
@@ -23,7 +22,7 @@ class WomenHome(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
     
     def get_queryset(self):
-        return Women.objects.filter(is_published=True)
+        return Women.objects.filter(is_published=True).select_related('cat')
 
 def about(request):
     """Пример использования пагинации совместно с функциями представления"""
@@ -71,13 +70,14 @@ class WomenCategory(DataMixin, ListView):
 
     def get_queryset(self):
         return Women.objects.filter(
-            cat__slug=self.kwargs['cat_slug'], is_published=True)
+            cat__slug=self.kwargs['cat_slug'], is_published=True).select_related('cat')
     
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        c = Category.objects.get(slug=self.kwargs['cat_slug'])
         c_def = self.get_user_context(
-            title='Категория - ' + str(context['posts'][0].cat),
-            cat_selected=context['posts'][0].cat_id)
+            title='Категория - ' + str(c.name),
+            cat_selected=c.pk)
         return dict(list(context.items()) + list(c_def.items()))
 
 class RegisterUser(DataMixin, CreateView):
@@ -110,4 +110,4 @@ class LoginUser(DataMixin, LoginView):
 
 def logout_user(request):
     logout(request)
-    return redirect('home')
+    return redirect('login')
